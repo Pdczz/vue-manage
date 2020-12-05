@@ -18,7 +18,7 @@ import org.springframework.web.util.HtmlUtils;
 
 import java.util.List;
 
-@CrossOrigin
+
 @RestController
 @RequestMapping("api")
 public class LoginController {
@@ -57,7 +57,7 @@ public class LoginController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-
+    @CrossOrigin(origins = "*")
     @PostMapping("login")
     public ResponseEntity<String> login(@RequestBody User user) {
         String username = user.getUsername();
@@ -85,8 +85,8 @@ public class LoginController {
         return ResponseEntity.ok("成功登出");
     }
     @ResponseBody
-    @GetMapping(value = "authentication")
-    public ResponseEntity<String> authentication(){
+    @GetMapping(value = "authen")
+    public ResponseEntity<String> authen(){
         return ResponseEntity.ok("身份认证成功");
     }
 

@@ -12,9 +12,7 @@ import org.apache.shiro.web.servlet.Cookie;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
+
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -48,7 +46,7 @@ public class ShiroConfiguration {
         filterChainDefinitionMap.put("/api/admin/**", "url");
         // 启用自定义过滤器
         shiroFilterFactoryBean.setFilters(customizedFilter);
-        filterChainDefinitionMap.put("/api/authentication", "authc");
+        filterChainDefinitionMap.put("/api/authen", "authc");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
         return shiroFilterFactoryBean;
     }
@@ -95,20 +93,6 @@ public class ShiroConfiguration {
         simpleCookie.setMaxAge(259200000);
         return simpleCookie;
     }
-    @Bean
-    public CorsFilter corsFilter() {
-        final UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
-        final CorsConfiguration corsConfiguration = new CorsConfiguration();
-        /*是否允许请求带有验证信息*/
-        corsConfiguration.setAllowCredentials(true);
-        /*允许访问的客户端域名*/
-        corsConfiguration.addAllowedOrigin("http://119.29.198.198:80");
-        /*允许服务端访问的客户端请求头*/
-        corsConfiguration.addAllowedHeader("*");
-        /*允许访问的方法名,GET POST等*/
-        corsConfiguration.addAllowedMethod("*");
-        urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
-        return new CorsFilter(urlBasedCorsConfigurationSource);
-    }
+
 }
 
