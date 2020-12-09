@@ -18,8 +18,11 @@ import java.util.List;
 
 @Service
 public class JotterArticleService {
+
     @Autowired
     private JotterArticleMapper jotterArticleMapper;
+
+
 
     public int insert(JotterArticle article) {
         JotterArticle jotterArticle = findById(article.getId());

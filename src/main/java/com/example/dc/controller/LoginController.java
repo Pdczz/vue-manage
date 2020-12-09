@@ -27,6 +27,7 @@ public class LoginController {
     @Autowired
     private AdminMenuService adminMenuService;
 
+    @CrossOrigin(origins = "*")
     @PostMapping("register")
     @ResponseBody
     public ResponseEntity<Void> register(@RequestBody User user) {

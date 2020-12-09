@@ -77,7 +77,7 @@ public class LibraryController {
     }
     @PostMapping("covers")
     public String coversUpload(MultipartFile file) throws Exception {
-        String folder = "/usr/local/img";
+        String folder = "/usr/local/image";
         File imageFolder = new File(folder);
         String substring = file.getOriginalFilename()
                 .substring(file.getOriginalFilename().length() - 4);
@@ -87,7 +87,7 @@ public class LibraryController {
             f.getParentFile().mkdirs();
         try {
             file.transferTo(f);
-            String imgURL = "http://localhost:9090/api/file/" + f.getName();
+            String imgURL = "http://pdczz.com/api/file/" + f.getName();
             return imgURL;
         } catch (IOException e) {
             e.printStackTrace();
