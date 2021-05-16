@@ -37,6 +37,13 @@ public class JotterArticleController {
         return ResponseEntity.ok(jotterArticleService.list(page, size));
     }
 
+
+    @GetMapping("/page")
+    public ResponseEntity<PageResult<JotterArticle>> listArticles2(@RequestParam("pid") Integer pid) {
+        return ResponseEntity.ok(jotterArticleService.list(pid, 9));
+    }
+
+
     /**
      * 根据id查询文章
      * @param id
