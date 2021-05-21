@@ -31,6 +31,7 @@ public class LoginController {
     @PostMapping("register")
     @ResponseBody
     public ResponseEntity<Void> register(@RequestBody User user) {
+
         String username = user.getUsername();
         String password = user.getPassword();
         username = HtmlUtils.htmlEscape(username);
