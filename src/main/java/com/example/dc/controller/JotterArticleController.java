@@ -27,13 +27,23 @@ public class JotterArticleController {
     }
 
     /**
-     * 分页查询
+     * 前台分页查询
      * @param size
      * @param page
      * @return
      */
     @GetMapping("article/{size}/{page}")
     public ResponseEntity<PageResult<JotterArticle>> listArticles(@PathVariable("size") Integer size, @PathVariable("page") Integer page) {
+        return ResponseEntity.ok(jotterArticleService.list(page, size));
+    }
+    /**
+     * 后台分页查询
+     * @param size
+     * @param page
+     * @return
+     */
+    @GetMapping("adminArticle/{size}/{page}")
+    public ResponseEntity<PageResult<JotterArticle>> listAdminArticles(@PathVariable("size") Integer size, @PathVariable("page") Integer page) {
         return ResponseEntity.ok(jotterArticleService.list(page, size));
     }
 

@@ -38,25 +38,32 @@ public class AdminMenuService {
     }
     public List<AdminMenu> getMenusByCurrentUser() {
         // 从数据库中获取当前用户
-        String username = SecurityUtils.getSubject().getPrincipal().toString();
+        String username="";
+        Object principal = SecurityUtils.getSubject().getPrincipal();
+        if (principal!=null){
+            username=principal.toString();
+        }
         User user = userMapper.queryByuserName(username);
-
-        // 获得当前用户对应的所有角色的 id 列表
-        List<Integer> rids = userMapper.queryRoleidByUserid(user.getId());
-
-        List<Integer> menuIds=null;
-        // 查询出这些角色对应的所有菜单项
-        if (!CollectionUtils.isEmpty(rids)){
-            menuIds = roleMapper.queryMidsByRids(rids)
-                    .stream().distinct().collect(Collectors.toList());
-        }
         List<AdminMenu> menus=null;
-        if (!CollectionUtils.isEmpty(menuIds)){
-            menus = menuMapper.selectByIdList(menuIds);
+        // 获得当前用户对应的所有角色的 id 列表
+        if (user!=null){
+            List<Integer> rids = userMapper.queryRoleidByUserid(user.getId());
+
+            List<Integer> menuIds=null;
+            // 查询出这些角色对应的所有菜单项
+            if (!CollectionUtils.isEmpty(rids)){
+                menuIds = roleMapper.queryMidsByRids(rids)
+                        .stream().distinct().collect(Collectors.toList());
+            }
+
+            if (!CollectionUtils.isEmpty(menuIds)){
+                menus = menuMapper.selectByIdList(menuIds);
+            }
+            if (!CollectionUtils.isEmpty(menus)){
+                handleMenus(menus);
+            }
         }
-        if (!CollectionUtils.isEmpty(menus)){
-            handleMenus(menus);
-        }
+
         // 处理菜单项的结构
 
         return menus;
