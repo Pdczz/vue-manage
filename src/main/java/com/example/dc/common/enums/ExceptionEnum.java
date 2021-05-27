@@ -21,7 +21,12 @@ public enum  ExceptionEnum {
     AUTHRO_FAILE(500,"认证失败"),
     ARTICLE_NOT_FOUND(404,"文章查询失败"),
     ARTICLE_DELETE_ERROR(500,"文章删除失败"),
-    ;
+    UPLOAD_FILE_REGISTER_FAIL(22001,"上传文件在系统注册失败，请刷新页面重试！"),
+    UPLOAD_FILE_REGISTER_EXIST(22002,"上传文件在系统已存在！"),
+    CHUNK_FILE_EXIST_CHECK(22003,"分块文件在系统已存在！"),
+    MERGE_FILE_FAIL(22004,"合并文件失败，文件在系统已存在！"),
+    MERGE_FILE_CHECKFAIL(22005,"合并文件校验失败！"),
+    UPLOAD_FILE_DATABASE_EXIST(22006,"上传文件在数据库已存在！");
 
 
     private int code;
