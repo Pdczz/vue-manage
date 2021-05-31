@@ -13,6 +13,27 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
+  redis:
+    host: 119.29.198.198
+    port: 6379
+    database: 0
+    password: root
+    lettuce:
+      pool:
+          max-active: 8
+          max-wait: -1
+          max-idle: 8
+          min-idle: 0
+    timeout: 2000
+  data:
+      redis:
+        repositories:
+          enabled: false
+  servlet:
+      multipart:
+        max-file-size: 1000MB
+xc-service-manage-media:
+  upload-location: F:/develop/video/
 
 mybatis:
   mapper-locations: classpath:/mappers/BookMapper.xml
