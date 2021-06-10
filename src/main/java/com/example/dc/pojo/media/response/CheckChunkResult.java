@@ -5,6 +5,8 @@ import com.example.dc.common.response.ResultCode;
 import lombok.Data;
 import lombok.ToString;
 
+import java.util.List;
+
 /**
  * Created by admin on 2018/3/5.
  */
@@ -14,14 +16,15 @@ public class CheckChunkResult extends ResponseResult {
     public CheckChunkResult() {
     }
 
-    public CheckChunkResult(boolean fileExist) {
+    public CheckChunkResult(List fileExist) {
         this.fileExist = fileExist;
     }
 
-    public CheckChunkResult(ResultCode resultCode, boolean fileExist) {
+    public CheckChunkResult(ResultCode resultCode, List fileExist) {
         super(resultCode);
         this.fileExist = fileExist;
     }
 //    @ApiModelProperty(value = "文件分块存在标记", example = "true", required = true)
-    boolean fileExist;
+    List fileExist;
+
 }

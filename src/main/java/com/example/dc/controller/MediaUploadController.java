@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/media/upload")
@@ -22,10 +25,10 @@ public class MediaUploadController {
     }
 
 
-    @PostMapping("/checkchunk")
+   /* @PostMapping("/checkchunk")
     public CheckChunkResult checkchunk(String fileMd5, Integer chunk, Integer chunkSize) {
         return mediaUploadService.checkchunk(fileMd5,chunk,chunkSize);
-    }
+    }*/
 
 
     @PostMapping("/uploadchunk")
@@ -46,5 +49,20 @@ public class MediaUploadController {
         String fileMd5 = jsonObject.getString("fileMd5");
         String fileName = jsonObject.getString("fileName");
         return mediaUploadService.mergechunks(fileMd5,fileName,fileSize);
+    }
+    @GetMapping("/test")
+    @ResponseBody
+    public String test(){
+        File f=new File("/usr/local/videos/test");
+        boolean flag=false;
+        try {
+            flag = f.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (flag){
+            return "success";
+        }
+        return "fail";
     }
 }

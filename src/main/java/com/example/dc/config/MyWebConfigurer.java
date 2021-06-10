@@ -15,7 +15,7 @@ public class MyWebConfigurer implements WebMvcConfigurer {
                 .allowedOrigins("*")
                 .allowedMethods("POST", "GET", "PUT", "OPTIONS", "DELETE")
                 .allowedHeaders("*")
-                .maxAge(3600);
+                .maxAge(3600);/*.allowedOrigins("http://admin.pdczz.com")*/
     }
 
     @Override

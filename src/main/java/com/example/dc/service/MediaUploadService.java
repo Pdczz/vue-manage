@@ -9,6 +9,7 @@ import com.example.dc.mapper.MediaFileMapper;
 import com.example.dc.pojo.media.MediaFile;
 import com.example.dc.pojo.media.response.CheckChunkResult;
 import com.example.dc.pojo.media.response.MediaCode;
+import com.example.dc.pojo.media.response.MediaExist;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
@@ -45,7 +46,7 @@ public class MediaUploadService {
      *  * @param fileExt 文件扩展名
      *  * @return 文件路径 */
     private String getFilePath(String fileMd5, String fileExt){
-        String filePath = uploadPath+fileMd5.substring(0, 1) + "/" + fileMd5.substring(1, 2) + "/" + fileMd5 + "/" + fileMd5 + "." + fileExt;
+        String filePath = uploadPath + "/" + fileMd5.substring(0, 1) + "/" + fileMd5.substring(1, 2) + "/" + fileMd5 + "/" + fileMd5 + "." + fileExt;
         return filePath;
     }
     //得到文件目录相对路径，路径中去掉根目录
@@ -57,7 +58,7 @@ public class MediaUploadService {
 
     //得到文件所在目录
     private String getFileFolderPath(String fileMd5){
-        String fileFolderPath = uploadPath+ fileMd5.substring(0, 1) + "/" + fileMd5.substring(1, 2) + "/" + fileMd5 + "/" ;
+        String fileFolderPath = uploadPath + "/" + fileMd5.substring(0, 1) + "/" + fileMd5.substring(1, 2) + "/" + fileMd5 ;/*+ "/"*/
         return fileFolderPath;
     }
     //创建文件目录
@@ -107,7 +108,7 @@ public class MediaUploadService {
         return fileChunkFolderPath;
     }
     //检查块文件
-    public CheckChunkResult checkchunk(String fileMd5, Integer chunk, Integer chunkSize) {
+   /* public CheckChunkResult checkchunk(String fileMd5, Integer chunk, Integer chunkSize) {
         //得到块文件所在路径
         String chunkfileFolderPath = getChunkFileFolderPath(fileMd5);
         //块文件的文件名称以1,2,3..序号命名，没有扩展名
@@ -117,7 +118,7 @@ public class MediaUploadService {
         }else{
             return new CheckChunkResult(MediaCode.CHUNK_FILE_EXIST_CHECK,false);
         }
-    }
+    }*/
     //块文件上传
     public ResponseResult uploadchunk(MultipartFile file, String fileMd5, Integer chunk) {
         if(file == null){
@@ -162,6 +163,8 @@ public class MediaUploadService {
          }
          return true;
     }
+
+
     public ResponseResult mergechunks(String fileMd5, String fileName, Long fileSize) {
         //获取块文件的路径
         String chunkfileFolderPath = getChunkFileFolderPath(fileMd5);
@@ -177,14 +180,17 @@ public class MediaUploadService {
         if(mergeFile.exists()){
             mergeFile.delete();
         }
+
         boolean newFile = false;
         try {
             newFile = mergeFile.createNewFile();
         } catch (IOException e) {
+            System.out.println("185mergeFile fail");
             e.printStackTrace();
         }
 
         if(!newFile){
+            System.out.println("newFile fail");
             throw new LyException(ExceptionEnum.MERGE_FILE_CHECKFAIL);
 
         }
@@ -193,13 +199,13 @@ public class MediaUploadService {
         //合并文件
         mergeFile = mergeFile(mergeFile, chunkFiles);
         if(mergeFile == null){
-
+            System.out.println("mergeFile fail");
             throw new LyException(ExceptionEnum.MERGE_FILE_FAIL);
         }
         //校验文件
         boolean checkResult = this.checkFileMd5(mergeFile, fileMd5);
         if(!checkResult){
-
+            System.out.println("chechResult");
             throw new LyException(ExceptionEnum.MERGE_FILE_CHECKFAIL);
         }
         //将文件信息保存到数据库
@@ -222,6 +228,7 @@ public class MediaUploadService {
         mediaFile.setFileStatus("301002");
         int insert = mediaFileMapper.insert(mediaFile);
         if (insert==-1){
+            System.out.println("insert fail");
             throw new LyException(ExceptionEnum.MERGE_FILE_CHECKFAIL);
         }
 //        MediaFile save = mediaFileRepository.save(mediaFile);
@@ -256,6 +263,7 @@ public class MediaUploadService {
         if(mergeFile == null || StringUtils.isEmpty(md5)){
             return false;
         }
+        long length = mergeFile.length();
         //进行md5校验
         FileInputStream mergeFileInputstream = null;
         try {
@@ -335,19 +343,32 @@ public class MediaUploadService {
         mediaFile.setFileId(fileMd5);
 
         MediaFile selectOne = mediaFileMapper.selectOne(mediaFile);
-//        Optional<MediaFile> optional = mediaFileRepository.findById(fileMd5);
         //文件存在直接返回
         if(file.exists() && selectOne!=null){
-            throw new LyException(ExceptionEnum.UPLOAD_FILE_REGISTER_EXIST);
+            return new ResponseResult(true,22002,"skipUpload");
+        }
+        //检查是否有chunks文件夹，如果有则说明上传过分块，如果没有则直接上传
+        String chunkFileFolderPath = getChunkFileFolderPath(fileMd5);
+        File chunkFileFolder = new File(chunkFileFolderPath);
+        if (chunkFileFolder.exists()){
+            //得到块文件所在路径
+            String chunkfileFolderPath = getChunkFileFolderPath(fileMd5);
+            //块文件的文件名称以1,2,3..序号命名，没有扩展名
+            File[] files = chunkFileFolder.listFiles();
+            int length = files.length;
+            File chunkFile = new File(chunkfileFolderPath+chunk);
+            List<Integer> exitChunks=new ArrayList<>();
+            for (int i = 1; i < length; i++) {
+                exitChunks.add(i);
+            }
+            return new CheckChunkResult(CommonCode.SUCCESS,exitChunks);
         }
         boolean fileFold = createFileFold(fileMd5);
         if(!fileFold){
             //上传文件目录创建失败
-
             throw new LyException(ExceptionEnum.UPLOAD_FILE_REGISTER_FAIL);
         }
         return new ResponseResult(CommonCode.SUCCESS);
-
     }
 
 }

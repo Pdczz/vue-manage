@@ -59,7 +59,7 @@ public class LoginController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @CrossOrigin(origins = "*")
+    @CrossOrigin(origins = "http://admin.pdczz.com")
     @PostMapping("login")
     public ResponseEntity<String> login(@RequestBody User user) {
         String username = user.getUsername();
@@ -87,6 +87,7 @@ public class LoginController {
         return ResponseEntity.ok("成功登出");
     }
     @ResponseBody
+    @CrossOrigin(origins = "http://admin.pdczz.com")
     @GetMapping(value = "authen")
     public ResponseEntity<String> authen(){
         return ResponseEntity.ok("身份认证成功");
