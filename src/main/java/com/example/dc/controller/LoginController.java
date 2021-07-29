@@ -87,7 +87,7 @@ public class LoginController {
         return ResponseEntity.ok("成功登出");
     }
     @ResponseBody
-    @CrossOrigin(origins = "http://admin.pdczz.com")
+    @CrossOrigin(origins = {"http://admin.pdczz.com","localhost:8080"})
     @GetMapping(value = "authen")
     public ResponseEntity<String> authen(){
         return ResponseEntity.ok("身份认证成功");

@@ -5,7 +5,10 @@ import com.example.dc.common.enums.ExceptionEnum;
 import com.example.dc.common.exception.LyException;
 import com.example.dc.common.response.CommonCode;
 import com.example.dc.common.response.ResponseResult;
+import com.example.dc.mapper.DocumentCategoryMapper;
+import com.example.dc.mapper.DocumentTypeMapper;
 import com.example.dc.mapper.MediaFileMapper;
+import com.example.dc.pojo.DocumentType;
 import com.example.dc.pojo.media.MediaFile;
 import com.example.dc.pojo.media.response.CheckChunkResult;
 import com.example.dc.pojo.media.response.MediaCode;
@@ -26,6 +29,10 @@ import java.util.*;
 public class MediaUploadService {
     @Autowired
     MediaFileMapper mediaFileMapper;
+    @Autowired
+    DocumentCategoryMapper documentCategoryMapper;
+    @Autowired
+    DocumentTypeMapper documentTypeMapper;
 
     //上传文件根目录
     @Value("${xc-service-manage-media.upload-location}")
@@ -216,6 +223,12 @@ public class MediaUploadService {
         if (mediaFileFromDataBase!=null){
             throw new LyException(ExceptionEnum.UPLOAD_FILE_DATABASE_EXIST);
         }
+        Integer cidByType = documentTypeMapper.findCidByType(fileExt);
+        if (cidByType!=null){
+            mediaFile.setCid(cidByType);
+        }else {
+            mediaFile.setCid(6);
+        }
         mediaFile.setFileName(fileMd5+"."+fileExt);
         mediaFile.setFileOriginalName(fileName);
         //文件路径保存相对路径
@@ -369,6 +382,15 @@ public class MediaUploadService {
             throw new LyException(ExceptionEnum.UPLOAD_FILE_REGISTER_FAIL);
         }
         return new ResponseResult(CommonCode.SUCCESS);
+    }
+
+    public List<MediaFile> queryAllMedia(){
+        return mediaFileMapper.selectAll();
+    }
+    public List<MediaFile> queryMediaByCategory(Integer cid){
+        MediaFile mediaFile = new MediaFile();
+        mediaFile.setCid(cid);
+        return mediaFileMapper.select(mediaFile);
     }
 
 }

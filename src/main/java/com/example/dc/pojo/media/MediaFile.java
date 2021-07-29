@@ -62,6 +62,7 @@ public class MediaFile {
     //tag标签用于查询
     @Column(name = "tag")
     private String tag;
-
+    @Column(name = "cid")
+    private Integer cid;
 
 }
