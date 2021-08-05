@@ -15,8 +15,10 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +45,7 @@ public class MediaUploadController {
     public ResponseResult uploadchunk(MultipartFile file, Integer chunkNumber, String identifier) {
         return mediaUploadService.uploadchunk(file,identifier,chunkNumber);
     }
+    //查看是否有分块，如果有则从分块数量-1开始上传
     @GetMapping("/uploadchunk")
     public ResponseResult uploadchunk(@RequestParam("chunkNumber") Integer chunkNumber, @RequestParam("identifier") String identifier, @RequestParam("filename") String filename) {
 
@@ -87,20 +90,94 @@ public class MediaUploadController {
         return new QueryResponseResult<>(CommonCode.SUCCESS,mediaFileQueryResult);
     }
 
+    @RequestMapping("/preview1")
+    public void er(HttpServletResponse response){
+        File file = new File("F:\\develop\\video\\d\\f\\df4db83c81f32e4bbf2f5ba5ded3cf7b\\df4db83c81f32e4bbf2f5ba5ded3cf7b.png");
+        if (file.exists()){
+            byte[] data = null;
+            try {
+                FileInputStream input = new FileInputStream(file);
+                data = new byte[input.available()];
+                input.read(data);
+                response.getOutputStream().write(data);
+                input.close();
+            } catch (Exception e) {
+                System.out.println(e);
+            }
 
-    @GetMapping("/test")
-    @ResponseBody
-    public String test(){
-        File f=new File("/usr/local/videos/test");
-        boolean flag=false;
-        try {
-            flag = f.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
+        }else{
+            return;
         }
-        if (flag){
-            return "success";
-        }
-        return "fail";
+
     }
+    @ResponseBody
+    @RequestMapping("/previewPDF")
+    public void findPdf(@RequestParam("path") String path,@RequestParam("Name") String Name, HttpServletResponse response) throws IOException{
+        response.setContentType("application/pdf");
+        FileInputStream in = new FileInputStream(new File("F:\\develop\\video\\7\\3\\73717375addc3a3099431107ed11e61b\\73717375addc3a3099431107ed11e61b.doc"));
+        OutputStream out = response.getOutputStream();
+        byte[] b = new byte[512];
+        while ((in.read(b))!=-1) {
+            out.write(b);
+        }
+        out.flush();
+        in.close();
+        out.close();
+    }
+
+    @ResponseBody
+    @RequestMapping("/preview3")
+    public void devDoc(HttpServletRequest request, HttpServletResponse response, String storeName) throws Exception {
+        request.setCharacterEncoding("UTF-8");
+        String ctxPath = request.getSession().getServletContext().getRealPath("");
+        String downLoadPath = "F:\\develop\\video\\0\\6\\06fbd76769a7154e119af56e1646ac87\\06fbd76769a7154e119af56e1646ac87.pdf";
+        response.setContentType("application/pdf");
+        FileInputStream in = new FileInputStream(new File(downLoadPath));
+        OutputStream out = response.getOutputStream();
+        byte[] b = new byte[1024];
+        while ((in.read(b))!=-1) {
+            out.write(b);
+        }
+        out.flush();
+        in.close();
+        out.close();
+    }
+    @ResponseBody
+    @RequestMapping("/preview")
+    public void download( HttpServletResponse response
+    ) throws IOException {
+        String filePath = "F:\\develop\\video\\0\\6\\06fbd76769a7154e119af56e1646ac87\\06fbd76769a7154e119af56e1646ac87.pdf";
+        System.out.println("filePath:" + filePath);
+        File f = new File(filePath);
+        if (!f.exists()) {
+            response.sendError(404, "File not found!");
+            return;
+        }
+        BufferedInputStream br = new BufferedInputStream(new FileInputStream(f));
+        byte[] bs = new byte[1024];
+        int len = 0;
+        response.reset(); // 非常重要
+        if (true) { // 在线打开方式
+            URL u = new URL("file:///" + filePath);
+            String contentType = u.openConnection().getContentType();
+            response.setContentType(contentType);
+            response.setHeader("Content-Disposition", "inline;filename="
+                    + "2019年上半年英语四级笔试准考证(戴林峰).pdf");
+            // 文件名应该编码成utf-8，注意：使用时，我们可忽略这句
+        } else {
+            // 纯下载方式
+            response.setContentType("application/x-msdownload");
+            response.setHeader("Content-Disposition", "attachment;filename="
+                    + "2019年上半年英语四级笔试准考证(戴林峰).pdf");
+        }
+        OutputStream out = response.getOutputStream();
+        while ((len = br.read(bs)) > 0) {
+            out.write(bs, 0, len);
+        }
+        out.flush();
+        out.close();
+        br.close();
+    }
+
+
 }
