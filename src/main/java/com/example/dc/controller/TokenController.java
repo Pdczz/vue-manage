@@ -1,15 +1,23 @@
 package com.example.dc.controller;
 
-import com.example.dc.common.utils.HttpUtil;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.example.dc.pojo.GithubUser;
 import com.example.dc.service.TokenService;
 import org.apache.commons.lang.StringUtils;
-import org.omg.CORBA.Request;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
+
+import java.io.IOException;
 
 import java.util.HashMap;
 
@@ -38,8 +46,35 @@ public class TokenController {
             String[] split = s.split("&");
             String[] token = split[0].split("=");
             String access_token = token[1];
-            ResponseEntity<String> forEntity = restTemplate.getForEntity("https://api.github.com/user?" + s, String.class);
-            System.out.println(forEntity);
+            String githubURL="https://api.github.com/user";
+//            ResponseEntity<String> forEntity = restTemplate.getForEntity("https://api.github.com/user" + s, String.class);
+            if (StringUtils.isNotEmpty(access_token)){
+                HttpHeaders headers = new HttpHeaders();
+                headers.set("authorization", "Bearer "+access_token);
+//                MediaType type=MediaType.parseMediaType("application/json;charset=UTF-8");
+
+//                headers.setContentType(type);
+                //过滤掉账号认证失败的时候抛出的401异常
+                restTemplate.setErrorHandler(new DefaultResponseErrorHandler(){
+                    @Override
+                    public void handleError(ClientHttpResponse response) throws IOException {
+                        if(response.getRawStatusCode() != 401){
+                            super.handleError(response);
+                        }
+                    }
+                });
+
+                ResponseEntity<Object> response = restTemplate.exchange(githubURL, HttpMethod.GET,new HttpEntity<byte[]>(headers),Object.class);
+                System.out.println(response);
+                Object body = response.getBody();
+                String s1 = body.toString();
+                JSON json = (JSON) JSONObject.toJSON(body);
+                GithubUser githubUser = JSON.toJavaObject(json, GithubUser.class);
+                System.out.println(githubUser);
+
+                System.out.println(body);
+
+            }
 
         }
         System.out.println(666);
