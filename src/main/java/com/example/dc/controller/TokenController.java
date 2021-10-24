@@ -32,7 +32,8 @@ public class TokenController {
     private RestTemplate restTemplate;
 
     @RequestMapping("githubToken")
-    public void getToken(@RequestParam("code") String code){
+    public ResponseEntity<GithubUser> getToken(@RequestParam("code") String code){
+        GithubUser githubUser=new GithubUser();
         if (StringUtils.isNotEmpty(code)){
             System.out.println(code);
             //获取到授权码,获取token
@@ -69,15 +70,11 @@ public class TokenController {
                 Object body = response.getBody();
                 String s1 = body.toString();
                 JSON json = (JSON) JSONObject.toJSON(body);
-                GithubUser githubUser = JSON.toJavaObject(json, GithubUser.class);
+                githubUser = JSON.toJavaObject(json, GithubUser.class);
                 System.out.println(githubUser);
 
-                System.out.println(body);
-
             }
-
         }
-        System.out.println(666);
-
+        return ResponseEntity.ok(githubUser);
     }
 }
