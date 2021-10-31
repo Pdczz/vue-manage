@@ -18,6 +18,8 @@ public enum  ExceptionEnum {
     USER_SAVE_ERROR(500,"用户新增失败"),
     BOOKS_UPDATE_ERROR(500,"图书更新失败"),
     PASSWORD_UPDATE_ERROR(500,"密码更新失败"),
+    GITHUB_LOGIN_ERROR(500,"Github服务器响应超时，请重试"),
+    GITHUB_CODE_EXPIRED(401,"GitHub登陆的code过期"),
     AUTHRO_FAILE(500,"认证失败"),
     ARTICLE_NOT_FOUND(404,"文章查询失败"),
     ARTICLE_DELETE_ERROR(500,"文章删除失败"),
