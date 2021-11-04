@@ -7,10 +7,14 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,13 +45,15 @@ public class TokenService {
      * @return
      */
     public String sendPost(String url,Map params) {
-
-        ResponseEntity<String> apiResponse = restTemplate.postForEntity
-                (
-                        url,
-                        generatePostJson(params),
-                        String.class
-                );
+        restTemplate.setErrorHandler(new DefaultResponseErrorHandler(){
+            @Override
+            public void handleError(ClientHttpResponse response) throws IOException {
+                if(response.getRawStatusCode() != 401){
+                    super.handleError(response);
+                }
+            }
+        });
+        ResponseEntity<String> apiResponse = restTemplate.postForEntity(url, generatePostJson(params), String.class);
         return apiResponse.getBody();
     }
     public String generateRequestParameters(String protocol, String uri, Map<String, String> params) {
@@ -66,27 +72,7 @@ public class TokenService {
         return sb.toString();
     }
 
-    /**
-     * get请求、请求参数为?拼接形式的
-     * <p>
-     * 最终请求的URI如下：
-     * <p>
-     * http://127.0.0.1:80/?name=zhangsan&sex=男
-     *
-     * @return
-     */
-    public String sendGet() {
-        Map<String, String> uriMap = new HashMap<>(6);
-        uriMap.put("name", "张耀烽");
-        uriMap.put("sex", "男");
 
-        ResponseEntity responseEntity = restTemplate.getForEntity
-                (
-                        generateRequestParameters("http", "127.0.0.1:80", uriMap),
-                        String.class
-                );
-        return (String) responseEntity.getBody();
-    }
 
 
 }

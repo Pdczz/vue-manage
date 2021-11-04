@@ -1,5 +1,6 @@
 package com.example.dc.controller;
 
+import com.example.dc.common.utils.RsaUtils;
 import com.example.dc.pojo.AdminRole;
 import com.example.dc.pojo.User;
 import com.example.dc.service.AdminRoleService;
@@ -47,6 +48,15 @@ public class UserController {
         }
         return users;
     }
+    @RequestMapping("/gener")
+    public void gener(){
+        try {
+            RsaUtils.generateKey("F:/rsa/rsa.pub","F:/rsa/rsa.pri","dc@Login(Auth}*^31)&dc%");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
 }

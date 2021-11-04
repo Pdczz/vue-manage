@@ -49,8 +49,8 @@ public class TokenController {
                 try {
                      s = tokenService.sendPost(url, jsonParams);
                 }catch (Exception exception){
-                    exception.printStackTrace();
                     throw new LyException(ExceptionEnum.GITHUB_LOGIN_ERROR);
+//                    exception.printStackTrace();
                 }
 
                 System.out.println("token: "+s);
